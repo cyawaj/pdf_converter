@@ -2,7 +2,8 @@ package me.season.pdfconvert.controller;
 
 import me.season.pdfconvert.convert.ConvertException;
 import me.season.pdfconvert.service.ConverterManager;
-import org.apache.commons.io.FileUtils;
+import me.season.pdfconvert.util.PDFUtils;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -85,12 +86,13 @@ public class ConvertController {
         }
         String localName = TMP_DIR + File.separator + new Date().getTime() + "_" + filename;
         try {
-            input = file.getInputStream();
             File destination = new File(localName);
-            FileUtils.copyToFile(input, destination);
+            file.transferTo(destination);
+            // 修改excel文件的页面设置
+            PDFUtils.modifyPageSetting(destination);
             localName = destination.getAbsolutePath();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage());
             return null;
         } finally {
             IOUtils.closeQuietly(input);
